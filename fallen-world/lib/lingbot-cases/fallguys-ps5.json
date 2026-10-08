@@ -19,7 +19,7 @@
     "movement": {
       "default": {
         "static": "The character idles in place, gently swaying side to side with subtle bouncing steps on the checkered deck.",
-        "dynamic": "The character waddles forward at full speed down the yellow path, arms flapping slightly as it maneuvers past obstacles and steps on platforms."
+        "dynamic": "The character walks slowly down the yellow path with small, deliberate waddling steps. The chase camera advances gently at the same pace, and nearby obstacles pass slowly."
       }
     },
     "events": [

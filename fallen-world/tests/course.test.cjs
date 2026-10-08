@@ -32,21 +32,56 @@ function load(file) {
 const { EXAMPLES, STRUCTURED_EXAMPLES, composePrompt } = load(
   path.join(root, "lib/lingbot-world-prompts.ts"),
 );
-const course = EXAMPLES[0];
+const course = STRUCTURED_EXAMPLES.case_fallguys_ps5;
+const football = STRUCTURED_EXAMPLES.case_football_solo_drill;
 
-test("only the supplied course is registered and its JPEG is present", () => {
-  assert.equal(EXAMPLES.length, 1);
+test("both scenes are registered with their reference images", () => {
+  assert.deepEqual(EXAMPLES.map((example) => example.id), [
+    "case_fallguys_ps5", "case_football_solo_drill",
+  ]);
   assert.equal(course.id, "case_fallguys_ps5");
   assert.equal(STRUCTURED_EXAMPLES[course.id], course);
   assert.equal(course.image.src, "/lingbot-cases/fallguys_ps5.jpg");
   assert.deepEqual(fs.readdirSync(path.join(root, "lib/lingbot-cases")), [
     "fallguys-ps5.json",
+    "football-solo-drill.json",
   ]);
   assert.deepEqual(fs.readdirSync(path.join(root, "public/lingbot-cases")), [
     "fallguys_ps5.jpg",
+    "football-solo-drill.png",
   ]);
   const image = fs.readFileSync(path.join(root, "public", course.image.src));
   assert.equal(image.subarray(0, 3).toString("hex"), "ffd8ff");
+  const footballImage = fs.readFileSync(path.join(root, "public", football.image.src));
+  assert.equal(footballImage.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
+});
+
+test("football has exactly Shoot and Dribble, with relaxed default movement", () => {
+  const { scene } = football;
+  assert.deepEqual(scene.events.map((event) => event.name), ["Shoot", "Dribble"]);
+  const walking = composePrompt(scene, true, []);
+  assert.ok(walking.includes("relaxed, unhurried pace"));
+  assert.ok(walking.includes("keep it close to his feet"));
+  assert.ok(walking.includes(scene.camera.default.dynamic));
+  assert.ok(!walking.includes(scene.events[0].detail));
+});
+
+test("football shoot releases ball possession and dribble follows movement input", () => {
+  const { scene } = football;
+  for (const moving of [false, true]) {
+    const variant = moving ? "dynamic" : "static";
+    const shot = composePrompt(scene, moving, [0]);
+    assert.ok(shot.includes(scene.events[0].detail));
+    assert.ok(shot.includes(scene.movement.shoot[variant]));
+    assert.ok(!shot.includes(scene.movement.default[variant]));
+    const dribble = composePrompt(scene, moving, [1]);
+    assert.ok(dribble.includes(scene.events[1].detail[variant]));
+    assert.ok(!dribble.includes(scene.events[0].detail));
+    const released = composePrompt(scene, moving, []);
+    assert.ok(!released.includes(scene.events[0].detail));
+    assert.ok(!released.includes(scene.events[1].detail[variant]));
+    assert.ok(released.includes(scene.movement.default[variant]));
+  }
 });
 
 test("keys 1–5 append the correct action and release restores the scene", () => {

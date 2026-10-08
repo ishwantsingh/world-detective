@@ -1,8 +1,8 @@
 # Fallen World
 
-A standalone copy of the LingBot World 2 starter with **Fall Guys PS5 Course** as its only bundled scene. The original app remains in `../world-detective`.
+A standalone copy of the LingBot World 2 starter with **Fall Guys PS5 Course** and **Football Solo Drill**. The original app remains in `../world-detective`.
 
-The supplied scene description is stored unchanged in [`lib/lingbot-cases/fallguys-ps5.json`](lib/lingbot-cases/fallguys-ps5.json). Its supplied reference image is [`public/lingbot-cases/fallguys_ps5.jpg`](public/lingbot-cases/fallguys_ps5.jpg). The three original scene JSON files and images are excluded from this app.
+The platformer scene is stored in [`lib/lingbot-cases/fallguys-ps5.json`](lib/lingbot-cases/fallguys-ps5.json), with its supplied reference image in [`public/lingbot-cases/fallguys_ps5.jpg`](public/lingbot-cases/fallguys_ps5.jpg). The football scene is [`lib/lingbot-cases/football-solo-drill.json`](lib/lingbot-cases/football-solo-drill.json), with its supplied image in [`public/lingbot-cases/football-solo-drill.png`](public/lingbot-cases/football-solo-drill.png). The three original starter scenes and images are excluded from this app.
 
 ## Run
 
@@ -14,9 +14,13 @@ pnpm dev
 
 Local environment configuration is copied from the original project and remains ignored by Git. For a fresh checkout, copy `.env.example` to `.env.local` and set `REACTOR_API_KEY` to your Reactor API key. `NEXT_PUBLIC_REACTOR_API_URL` is optional; it defaults to `https://api.reactor.inc`.
 
-Open the URL printed by the development server (normally http://localhost:3000), click **Connect**, then select **Fall Guys PS5 Course** in Quick Start. This uploads the starting image, sends the composed scene prompt, and starts streaming video.
+Open the URL printed by the development server (normally http://localhost:3000), click **Connect**, then select either scene in Quick Start. This uploads the starting image, sends the composed scene prompt, and starts streaming video.
 
 ## Controls
+
+For **Football Solo Drill**, hold **1** to shoot toward the goal and **2** to dribble. Normal movement walks with the ball at a relaxed pace. Dribble adds close-control alternating touches while walking, or side-to-side touches in place when stationary. Shooting selects a separate movement description so the prompt does not simultaneously insist that the ball stays at the player's feet. All actions use the inherited hold/release prompt controls; the HUD remains part of generated video.
+
+For **Fall Guys PS5 Course**:
 
 | Key | Action |
 | --- | --- |
@@ -51,6 +55,6 @@ pnpm test
 pnpm build
 ```
 
-Tests verify the course registry, reference image, action order, hold/release prompt behavior, moving versus idle framing, and jump/slide/stand prompts. A live generation session requires a Reactor key and is separate from these local checks.
+Tests verify both scene registrations and images, action order, hold/release prompt behavior, football shooting and dribbling, moving versus idle framing, and jump/slide/stand prompts. A live generation session requires a Reactor key and is separate from these local checks.
 
 Next.js 15 · React 19 · TypeScript · Tailwind v4 · `@reactor-models/lingbot-world-2`.

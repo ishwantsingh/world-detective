@@ -1,0 +1,45 @@
+{
+  "id": "case_forest_hunting",
+  "name": "Forest Hunting",
+  "description": "First-person forest hunt — cautious walking; key 1 = scope, key 2 = shoot; hold 1 and press 2 to shoot through the scope",
+  "image": {
+    "label": "Scoped Rifle and Deer in a Sunlit Forest",
+    "src": "/lingbot-cases/forest-hunting.png"
+  },
+  "scene": {
+    "base": {
+      "default": "A hunter with camouflage sleeves and dark gloves holds a black bolt-action hunting rifle fitted with a telescopic sight in a quiet woodland, matching the reference image. Tall birch and pine trunks, mossy rocks, fallen branches, ferns, and autumn leaves frame a small grassy clearing. Warm low sunlight filters through the trees and pale mist. A small herd of deer occupies the clearing ahead, with one antlered stag slightly left of center as the initial aiming target. The forest layout and animal identities remain consistent. A compass stays along the top edge; the ammunition counter and bolt-action rifle information stay at bottom right. The ammunition display retains its current count between shots."
+    },
+    "camera": {
+      "default": {
+        "static": "Strict first-person view along the hunter's eye line toward the clearing and antlered stag. The viewpoint remains steady at standing height; look-input adjusts the aim. The hunter is never shown from outside his body. Any scope magnification remains aligned with this same aim direction.",
+        "dynamic": "Strict first-person view follows the hunter's short, cautious walking steps through the woodland. The rifle and view have only a gentle walking sway as nearby leaves and rocks pass slowly. Look-input adjusts the aim toward the clearing; the camera never cuts to an external or third-person view."
+      }
+    },
+    "movement": {
+      "default": {
+        "static": "The hunter stands still, supporting the rifle in both gloved hands. Quiet breathing produces a barely perceptible rifle sway while the deer graze or watch the clearing.",
+        "dynamic": "The hunter advances at a slow, deliberate walking pace in the selected direction, taking small grounded steps between mossy rocks and fallen branches. The rifle stays supported in both hands, with restrained arm movement and gentle footstep bob. The ground slides gradually beneath the viewpoint."
+      },
+      "aim": {
+        "static": "The hunter settles the rifle firmly into his shoulder, holds his supporting hand steady, and slows his breathing to keep the aim on the stag. Only a tiny natural sight sway remains.",
+        "dynamic": "The hunter shortens his cautious steps and keeps the rifle firmly shouldered, steadying his aim on the stag with minimal sight sway. His movement remains measured and unhurried."
+      }
+    },
+    "events": [
+      {
+        "name": "Scope",
+        "movementVersion": "aim",
+        "detail": "The hunter brings his eye to the rifle's telescopic sight. The view transitions into a circular magnified riflescope image with a dark outer vignette and a thin, centered crosshair. The antlered stag is enlarged in the same clearing, with the crosshair initially resting on its chest; the surrounding trees and aim direction remain consistent. Look-input moves the scoped aim smoothly. This scoped view remains while the Scope action is held, including during a shot; releasing Scope returns to the normal first-person rifle view without changing location."
+      },
+      {
+        "name": "Shoot",
+        "movementVersion": "aim",
+        "detail": "The hunter fires one deliberate rifle shot along the current aiming direction toward the stag's chest. A brief muzzle flash and sharp recoil lift the rifle and sight slightly, then they settle back onto the same aim line. If the Scope action is held, the shot and recoil remain inside the magnified scope view; otherwise they remain in the normal first-person view. A shot on target makes the stag visibly jolt and fall onto the grass, while the other deer startle and scatter between the trees. The hunter cycles the bolt, ejecting one spent casing, and the bottom-right loaded-ammunition count decreases by one, from 3 to 2 on the first shot, with the reserve unchanged. The hunter then steadies the rifle again rather than firing an automatic burst."
+      }
+    ],
+    "jumpPrompt": "The hunter makes a small careful hop over a low fallen branch, briefly lifting the first-person viewpoint before landing softly and steadying the supported rifle.",
+    "crouchPrompt": "The hunter lowers into a quiet crouch behind the low ferns, bringing the first-person viewpoint closer to the mossy ground while keeping the rifle aimed toward the clearing.",
+    "standPrompt": "The hunter rises smoothly to normal standing height, keeping the same first-person aim direction and the rifle supported in both hands."
+  }
+}

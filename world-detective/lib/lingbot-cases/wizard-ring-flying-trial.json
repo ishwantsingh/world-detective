@@ -1,0 +1,30 @@
+{
+  "id": "wizard_ring_flying_trial",
+  "name": "Wizard: Ring Flying Trial",
+  "description": "Third-person broom-flying trial — steer through successive rings generated along a rocky valley course; Space = climb, C = descend; no events",
+  "image": {
+    "label": "Wizard on a broom approaching bannered trial rings in a rocky green valley",
+    "src": "/lingbot-cases/wizard-ring-flying-trial.png"
+  },
+  "scene": {
+    "base": {
+      "default": "A young wizard with short brown hair, a burgundy hooded cloak edged with ornate gold embroidery, dark trousers and leather boots sits astride a weathered wooden broomstick just above the grass in a rugged green mountain valley. A winding dirt path threads between mossy rocks, grassy slopes, small yellow wildflowers and weathered stone ruins, with a gothic castle and pointed towers in the distance beneath an overcast sky. This is a broom-flying trial: the wizard's aim is to steer through the open centres of successive large circular rings along the valley. The rings have thick, weathered tan rims, rope bindings and curved red cloth banners at their sides; the nearest hoop is mounted on a short post and stone footing, matching the reference image. Further rings mark a continuous, flyable route between the rocks at varied heights and gentle turns. New rings are generated farther ahead as the course continues, matching the existing hoops and leaving their centres clear. Visible rings stay fixed in the landscape. Realistic cinematic fantasy, soft diffuse daylight, muted green hills, detailed stone and wind-rippled fabric."
+    },
+    "camera": {
+      "default": {
+        "static": "Third-person view from close behind and slightly above the wizard, with the cloak, boots and broomstick in the lower centre of the frame and the nearest trial ring clearly visible ahead. The rider stays at a fixed position and constant size; look-input alone arcs the camera around the stationary rider. The camera stays still without look-input and never switches to first-person.",
+        "dynamic": "Strict third-person rear tracking view from close behind and slightly above the wizard, holding the cloak and broomstick in the lower centre at a constant size and trailing distance. Look-input turns the rider's heading while the camera follows from behind. The view leaves room above the wizard to judge each ring's opening, with the rocky valley moving naturally past and no camera cuts or switch to first-person."
+      }
+    },
+    "movement": {
+      "default": {
+        "static": "The wizard hovers steadily on the broomstick, hands gripping the shaft and boots hanging below, with the burgundy cloak and red ring banners fluttering gently in the breeze. The wizard holds position without movement input; the trial waits for the player to move, and the rings remain anchored in the landscape.",
+        "dynamic": "The wizard flies along the course in response to movement input, leaning with the broom as the cloak streams behind and grass, rocks and the dirt path slide beneath. The next ring grows larger on approach, and the player adjusts heading and height to line up with its open centre. Only an aligned flight path carries the wizard and broom through the opening; missed rings stay where they are, with no automatic steering or snapping into a ring. After a successful passage the crossed hoop falls behind and the following ring becomes the next target, while more matching rings are generated farther along the valley to continue the trial."
+      }
+    },
+    "events": [],
+    "jumpPrompt": "The wizard raises the broomstick's nose and climbs smoothly toward a higher ring opening, staying seated on the broom as the trailing camera follows the ascent.",
+    "crouchPrompt": "The wizard leans forward and lowers the broomstick's nose, descending smoothly toward a lower ring opening while keeping the broom and boots clear of the terrain; the trailing camera follows lower.",
+    "standPrompt": "The wizard eases upright and levels the broomstick, settling into steady flight at the current height while the camera holds its position behind the rider."
+  }
+}

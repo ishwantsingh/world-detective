@@ -44,9 +44,10 @@ The API key never reaches the browser: the server route [`app/api/reactor/token/
 
 ## What you can do with it
 
-- **Quick Start examples.** Three curated scenes (a noir alley patrol, a battlefield horseman, a jet-ski cruise). One click uploads the image, sends the prompt, and starts.
+- **Quick Start examples.** Six curated scenes: noir alley patrol, battlefield horseman, jet-ski cruise, Backrooms PS5 anomaly, wizard broomstick flight, and wizard ring flying trial. One click uploads the image, sends the prompt, and starts. Wizard flight is a continuous golden-ring broom trial; Space climbs, C descends, key 1 boosts and key 2 starts a storm front.
+- **Wizard: Ring Flying Trial.** Uses the supplied rocky-valley reference image. Steer the broom with WASD and arrows or mouse-look, use Space to climb and C to descend, and aim through successive red-bannered rings. The scene prompt generates more rings farther along the course as you advance. It has no hold-key events or collectibles; ring passage is described to the world model, without a separate scoring system.
 - **Drive the world.** WASD (or the joystick) moves via `set_move_longitudinal` / `set_move_lateral`; arrows and click-to-engage mouse-look rotate via per-latent `set_camera_pose` deltas; Q/E roll; O toggles orbit (circle a point ahead instead of turning in place).
-- **Trigger world events.** Each scene binds detail clauses to hold-keys 1–9 — hold to weave the event into the prompt, release to revert.
+- **Trigger world events.** Scenes with events bind detail clauses to hold-keys 1–9 — hold to weave the event into the prompt, release to revert.
 - **Jump and crouch** with selectable modes, from a simple prompt swap up to hand-editable per-step motion arcs (charge levels, dip patterns). The motion system is documented in [`skill/SKILL.md`](skill/SKILL.md).
 - **Edit prompts live.** Click ✎ on any example to open the layered scene editor (base / camera / movement / events / vertical) — editing the running scene re-sends the prompt on the fly, and edits persist in `localStorage` until you press ↺. The **Show prompt** inspector (under Advanced) shows exactly what composed prompt the model is seeing and why.
 - **Bring your own scene.** The Custom scene card takes your image plus a from-scratch layered prompt.
@@ -65,6 +66,22 @@ The model only ever sees a single prose string (`set_prompt`), but the app autho
 `composePrompt()` flattens the active selection to prose and the controller re-sends it whenever the input state changes — so the text always matches the motion. The inspector panel visualizes this composition live.
 
 ## Configuration
+
+### PS5 pickup counter
+
+Set `GEMINI_API_KEY` in `.env` or `.env.local` (a server-only key from [Google AI Studio](https://aistudio.google.com/apikey)), then restart the app. `GOOGLE_API_KEY` is also accepted. `GEMINI_MODEL` optionally overrides `gemini-3.8-flash`. If Google rejects a request, the counter displays its error detail; retired model overrides must be updated to an available model.
+
+The video shows a PS5 counter in the top-left corner. While generation is running and the tab is visible, it captures one JPEG snapshot per second at up to 640 pixels wide. The server sends a rolling sequence of 2–5 frames to Gemini to distinguish walking over a console from seeing it, passing beside it, turning away, or the console vanishing. Frames go to Google for inference; the app does not persist them. Each confirmed crossing increments the count by one. Confidence filtering, timestamp checks and rearming prevent repeated awards from overlapping windows. Resetting, changing scenes or disconnecting clears the count; pausing preserves it and stops sampling.
+
+Wizard flight also uses the counter: Gemini looks for the rider flying through a floating console's position. Blue sparks alone do not award a pickup; the image sequence must show the approach and crossing.
+
+Only one inference request runs at a time. Slow inference keeps the latest five snapshots rather than building an unbounded queue. Failed requests back off; a missing key appears directly in the counter with a Retry button. This is visual inference, not a game collision engine: ambiguous crossings, very close successive consoles, or crossings missed between snapshots may not count. Count updates follow Gemini's response latency. Run `pnpm test` for request validation, Gemini response handling and pickup deduplication tests.
+
+### Gemini broom autopilot
+
+Start **Wizard: Broomstick Flight**, then select **Start Autopilot** below the movement controls. While enabled, the browser samples two or three consecutive live frames (at most 512 pixels wide) and sends them to the same server-side Gemini integration. Gemini returns a tightly constrained, validated set of `WASD` and arrow-key intents: WASD commands forward/back/strafe movement; arrows become the next LingBot camera-pose heading adjustment. The latest heading is re-applied on each generated chunk, so the wizard keeps turning until the next visual decision arrives. The model is instructed to favour the nearest visible ring, make small corrections, and stop rather than inventing a target. Low-confidence replies, errors, paused generation, session changes, and toggling autopilot off all immediately send neutral movement. Frames are not persisted.
+
+Autopilot is intentionally opt-in and uses the `GEMINI_API_KEY` already required by the pickup counter. Because the generated world is probabilistic and Gemini sees compressed snapshots rather than game geometry, it is a visual controller, not a deterministic collision solver. Manual movement is superseded while it is enabled; turn it off to take over instantly.
 
 | Env var                       | Required | What it does                                                                    |
 | ----------------------------- | -------- | ------------------------------------------------------------------------------- |

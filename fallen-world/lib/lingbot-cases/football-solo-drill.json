@@ -1,47 +1,52 @@
 {
-  "id": "case_football_solo_drill",
+  "id": "case_football_solo_drill_walk_v2",
   "name": "Football Solo Drill",
-  "description": "Third-person football practice — relaxed movement with the ball; key 1 = shoot, key 2 = dribble",
+  "description": "Leisurely third-person football practice — walk with the ball; key 1 = shoot, key 2 = close-control dribble",
   "image": {
     "label": "Football Solo Practice Stadium",
     "src": "/lingbot-cases/football-solo-drill.png"
   },
   "scene": {
     "base": {
-      "default": "A football player wearing a red jersey with white sleeves and the number 7 on his back, red shorts, red socks, and football boots practices alone on a bright green stadium pitch. There is exactly one black-and-white football and a white goal with netting straight ahead across the field. White halfway-line and center-circle markings cross the closely cut grass. Large shaded stadium stands, advertising boards, and electronic scoreboards surround the pitch under a partially covered roof, with sunlight illuminating the field. A football icon and 'SHOT: 0' appear in the top-left HUD; 'SOLO DRILL', 'PRACTICE MODE', and a timer appear at top right, with a small pitch minimap at the bottom center. Realistic football video-game presentation."
+      "default": "A lone football player takes part in a quiet, unhurried ball-control practice session on a sunny green stadium pitch. He wears the reference image's red number-7 jersey with white sleeves, red shorts, red socks, and football boots. There is exactly one black-and-white football and one white goal with netting at a fixed position ahead. The halfway line and center circle remain fixed on the neatly cut grass. Shaded stadium stands, advertising boards, and scoreboards surround the field beneath a partially covered roof. The shot-counter HUD stays at the top left; the solo-drill practice label and timer stay at the top right, with a small pitch minimap at the bottom center. A relaxed training exercise with space to handle the ball carefully."
     },
     "camera": {
       "default": {
-        "static": "Third-person view directly behind and slightly above the football player, keeping his back and full body centered at a constant size and distance, with the ball and distant goal visible ahead. The camera stays steady while he is stationary; look-input is the only source of camera rotation.",
-        "dynamic": "A smooth third-person chase camera follows closely behind and slightly above the football player at a gentle pace, keeping his back centered and the ball visible on the grass ahead. It maintains a fixed rear position as he moves; look-input changes his heading without cutting away from the player."
+        "static": "Third-person view from directly behind and slightly above the player, his back and full body centered at a constant size and distance. His boots, the grass immediately ahead, and the distant goal remain visible. Neither player nor camera changes position while idle; look-input alone arcs the camera around the stationary player.",
+        "dynamic": "Strict third-person rear view from close behind and slightly above the player, his back and body filling the center of the frame at a constant size. The camera holds a fixed position relative to him and tracks his steps without orbiting, zooming, or cutting. Look-input changes his heading. His boots and the ball's path on the grass remain visible."
       }
     },
     "movement": {
       "default": {
-        "static": "The player stands relaxed on the grass with the ball settled beside his boots, gently shifting his weight and breathing. He remains in place until movement input is given.",
-        "dynamic": "The player walks with the ball at a relaxed, unhurried pace, using small, gentle touches to keep it close to his feet as he moves across the grass in the chosen direction. His strides are short and deliberate, his arms swing naturally, and the camera advances slowly with him. He does not run or sprint."
+        "static": "The player stands still with the ball resting beside his boots, his weight settled on both feet and his arms hanging loosely. His chest rises and falls with quiet breaths; the ball remains on the grass beside him.",
+        "dynamic": "The player advances with the ball at a steady, leisurely walking pace in the selected direction. He takes short heel-to-toe steps, smoothly transfers his weight between planted feet, and keeps one foot supporting his body during each walking stride. His torso stays upright and his arms swing loosely. Between steps, a soft boot touch rolls the ball only a few inches, keeping it close to his feet. The white field markings and grass slide gradually beneath him, with a settled pause between gentle ball touches."
       },
       "shoot": {
-        "static": "The player steadies his stance on the grass, shifts his weight onto his supporting leg, and keeps his eyes on the goal as he prepares and follows through on a shot.",
-        "dynamic": "The player takes a few slow, measured approach steps in the chosen direction, settles his supporting foot, and follows through on his shot, staying balanced as the ball travels away."
+        "static": "The player settles into a balanced standing stance, plants his supporting foot, and shifts his weight for one deliberate shot, remaining upright as he follows through.",
+        "dynamic": "The player takes one or two short walking steps to the ball, plants his supporting foot, and shifts his weight for one deliberate shot. He follows through from a balanced upright posture while the ball travels away."
+      },
+      "dribble": {
+        "static": "The player remains in place with his knees slightly bent, shifting his weight between planted feet as he gently works the ball from one boot to the other.",
+        "dynamic": "The player maintains his steady, leisurely walking pace while performing small close-control steps in the selected direction. His feet alternate between supporting his upright body and gently guiding the ball; his arms remain loose. The ball stays within a short step of his boots as the grass and field markings pass gradually beneath him."
       }
     },
     "events": [
       {
         "name": "Shoot",
         "movementVersion": "shoot",
-        "detail": "The player plants his left foot beside the ball, draws his right leg back, and strikes the ball firmly with his right instep toward the goal straight ahead. The single ball leaves his foot and travels across the pitch toward the goal as his kicking leg follows through and his arms extend for balance. The camera stays behind the player, showing the shot traveling away; no second ball appears at his feet."
+        "detail": "The player draws his right leg back and strikes the single ball with his right instep toward the distant goal. His kicking leg follows through and his arms open for balance. The ball leaves his foot, travels across the grass toward the goal, and remains visible ahead of him; his feet are now clear of the ball. The rear camera stays with the player rather than cutting to a close-up of the goal."
       },
       {
         "name": "Dribble",
+        "movementVersion": "dribble",
         "detail": {
-          "static": "The player performs a controlled dribble in place, alternating light inside-foot touches to roll the ball from side to side between his boots, gently bending his knees and shifting his weight without advancing across the pitch.",
-          "dynamic": "The player performs a close-control dribble while moving at a relaxed walking pace, alternating gentle touches between his left and right feet and weaving slightly from side to side. The ball rolls naturally over the grass and remains within one short step of his boots; he does not sprint or kick it far ahead."
+          "static": "Gentle alternating inside-foot touches roll the ball a few inches left and right between the player's boots. He shifts his weight calmly with each touch and stays in the same spot on the pitch.",
+          "dynamic": "Gentle alternating inside-foot touches guide the ball slightly left and right in a small zigzag as the player walks. Each touch rolls it only a few inches; the next walking step catches up with it before another touch. This close-control dribble keeps the same relaxed walking rhythm."
         }
       }
     ],
-    "jumpPrompt": "The player makes a small, balanced hop off both feet with his arms slightly raised, then lands softly on the grass without kicking the ball.",
-    "crouchPrompt": "The player bends his knees into a low athletic stance, lowering his body while the camera dips gently toward the grass.",
-    "standPrompt": "The player straightens into a relaxed upright stance as the camera rises smoothly back to its normal third-person height."
+    "jumpPrompt": "The walking or idle gait briefly gives way to one small, balanced hop: the player lifts off both feet with his arms slightly raised, lands softly on the grass, and settles back into his previous relaxed posture. The hop does not strike the ball.",
+    "crouchPrompt": "The player bends his knees and lowers his upright body into a compact, balanced stance while the camera dips gently toward the grass.",
+    "standPrompt": "The player straightens into his relaxed standing or leisurely walking posture as the camera rises smoothly back to its normal third-person height."
   }
 }

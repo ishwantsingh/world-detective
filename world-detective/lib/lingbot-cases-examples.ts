@@ -15,17 +15,23 @@
 // {static,dynamic} = idle vs. forward motion; each non-jump action slot
 // (keys 1..9) is one append-mode event clause. composePrompt() concatenates
 // the active selection at runtime. Source images live at
-// public/lingbot-cases/<id>.jpg.
+// public/lingbot-cases/ at each example's image.src path.
 
 import type { StructuredExample } from "@/lib/lingbot-world-prompts";
 
 import noirAlleyPatrol from "./lingbot-cases/noir-alley-patrol.json";
 import battlefieldHorseman from "./lingbot-cases/battlefield-horseman.json";
 import jetSkiCruise from "./lingbot-cases/jet-ski-cruise.json";
+import backroomsPs5Anomaly from "./lingbot-cases/backrooms-ps5-anomaly.json";
+import wizardBroomstickFlight from "./lingbot-cases/wizard-broomstick-flight.json";
+import wizardRingFlyingTrial from "./lingbot-cases/wizard-ring-flying-trial.json";
 
 // The display order of the example chips. Add new examples here.
 export const LINGBOT_CASES_EXAMPLE_LIST: StructuredExample[] = [
   noirAlleyPatrol,
   battlefieldHorseman,
   jetSkiCruise,
+  backroomsPs5Anomaly,
+  wizardBroomstickFlight,
+  wizardRingFlyingTrial,
 ] as StructuredExample[];

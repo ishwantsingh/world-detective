@@ -1,0 +1,53 @@
+{
+  "id": "case_mortal_kombat_ice_fire_facing_v2",
+  "name": "Mortal Kombat Ice vs Fire",
+  "description": "Fixed side-on duel, fighters always face each other — key 1 = only left fighter casts ice at the stationary right fighter; key 2 = only right fighter casts a small fireball at the stationary left fighter",
+  "image": {
+    "label": "Ice Fighter vs Fire Fighter in the Ruined Arena",
+    "src": "/lingbot-cases/mortal-kombat-ice-fire.jpg"
+  },
+  "scene": {
+    "base": {
+      "default": "Exactly two fighters occupy the ruined stone arena. LEFT blue Sub-Zero faces directly RIGHT; RIGHT red Scorpion faces directly LEFT. Both fighters' head, gaze, chest, shoulders, hips, knees, and toes point directly at their opponent at ALL TIMES. Their bodies present opposing side profiles; their feet stay planted, their screen sides never swap, and neither turns toward the viewer or away from his opponent. Skull arches, iron gate, torches, brazier, and flagstones remain fixed. The TOP-LEFT blue SUB-ZERO health bar belongs to the LEFT fighter; the TOP-RIGHT orange-red SCORPION bar belongs to the RIGHT fighter. Both fills retain the latest visible health levels between actions, without refilling.",
+      "left_ice": "Exactly two fighters occupy the ruined stone arena. LEFT blue Sub-Zero faces directly RIGHT; RIGHT red Scorpion faces directly LEFT. Both fighters' head, gaze, chest, shoulders, hips, knees, and toes point directly at their opponent at ALL TIMES. Their bodies present opposing side profiles; their feet stay planted, their screen sides never swap, and neither turns toward the viewer or away from his opponent. Skull arches, iron gate, torches, brazier, and flagstones remain fixed. The TOP-LEFT blue SUB-ZERO health bar belongs to the LEFT fighter; the TOP-RIGHT orange-red SCORPION bar belongs to the RIGHT fighter. Both fills retain the latest visible health levels between actions, without refilling. Only LEFT attacks; RIGHT receives the hit.",
+      "right_fire": "Exactly two fighters occupy the ruined stone arena. LEFT blue Sub-Zero faces directly RIGHT; RIGHT red Scorpion faces directly LEFT. Both fighters' head, gaze, chest, shoulders, hips, knees, and toes point directly at their opponent at ALL TIMES. Their bodies present opposing side profiles; their feet stay planted, their screen sides never swap, and neither turns toward the viewer or away from his opponent. Skull arches, iron gate, torches, brazier, and flagstones remain fixed. The TOP-LEFT blue SUB-ZERO health bar belongs to the LEFT fighter; the TOP-RIGHT orange-red SCORPION bar belongs to the RIGHT fighter. Both fills retain the latest visible health levels between actions, without refilling. Only RIGHT attacks; LEFT receives the hit."
+    },
+    "camera": {
+      "default": {
+        "static": "The locked side-on camera remains perpendicular to the line joining the fighters. Both full bodies, opposing side profiles, the complete projectile path, and both health bars stay visible at constant size. No orbit, zoom, pan, or cuts.",
+        "dynamic": "The locked side-on camera remains perpendicular to the line joining the fighters. Both full bodies, opposing side profiles, the complete projectile path, and both health bars stay visible at constant size. No orbit, zoom, pan, or cuts."
+      }
+    },
+    "movement": {
+      "default": {
+        "static": "Both fighters stay planted in their original guards, facing directly toward each other. Subtle breathing, local blue frost on the left, and local orange flames on the right animate the idle scene. Neither attacks or changes position.",
+        "dynamic": "Both fighters stay planted in their original guards, facing directly toward each other. Subtle breathing, local blue frost on the left, and local orange flames on the right animate the idle scene. Neither attacks or changes position."
+      },
+      "left_ice": {
+        "static": "Only the LEFT blue ice fighter animates: facing RIGHT with planted feet, he extends both palms straight at his opponent. The RIGHT red fire fighter remains motionless facing LEFT in his unchanged guard throughout wind-up and flight. He neither dodges, blocks, steps, turns, nor counterattacks. Only contact permits one passive impact shudder, with feet and facing unchanged.",
+        "dynamic": "Only the LEFT blue ice fighter animates: facing RIGHT with planted feet, he extends both palms straight at his opponent. The RIGHT red fire fighter remains motionless facing LEFT in his unchanged guard throughout wind-up and flight. He neither dodges, blocks, steps, turns, nor counterattacks. Only contact permits one passive impact shudder, with feet and facing unchanged."
+      },
+      "right_fire": {
+        "static": "Only the RIGHT red fire fighter animates: facing LEFT with planted feet, he extends his casting hand straight at his opponent. The LEFT blue ice fighter remains motionless facing RIGHT in his unchanged guard throughout wind-up and flight. He neither dodges, blocks, steps, turns, nor counterattacks. Only contact permits one passive impact shudder, with feet and facing unchanged.",
+        "dynamic": "Only the RIGHT red fire fighter animates: facing LEFT with planted feet, he extends his casting hand straight at his opponent. The LEFT blue ice fighter remains motionless facing RIGHT in his unchanged guard throughout wind-up and flight. He neither dodges, blocks, steps, turns, nor counterattacks. Only contact permits one passive impact shudder, with feet and facing unchanged."
+      }
+    },
+    "events": [
+      {
+        "name": "Left Ice Ball",
+        "baseVersion": "left_ice",
+        "movementVersion": "left_ice",
+        "detail": "The LEFT fighter launches one blue-white ice ball horizontally from LEFT to RIGHT, directly along the line from his palms to the RIGHT fighter's chest. It flies straight across the gap and directly hits the RIGHT fighter's chest, bursting into frost on contact. The RIGHT fighter remains planted facing LEFT and only shudders passively from impact. Only AFTER this visible hit, the TOP-RIGHT SCORPION health bar loses about one tenth of its current fill. The TOP-LEFT SUB-ZERO health bar remains unchanged. LEFT retracts his arms; RIGHT never retaliates. Both keep facing each other, and the reduced right-side health persists."
+      },
+      {
+        "name": "Right Small Fireball",
+        "baseVersion": "right_fire",
+        "movementVersion": "right_fire",
+        "detail": "The RIGHT fighter launches one small, roughly fist-sized orange fireball horizontally from RIGHT to LEFT, directly along the line from his hand to the LEFT fighter's chest. It flies straight across the gap and directly hits the LEFT fighter's chest, bursting into a small puff of flame on contact. The LEFT fighter remains planted facing RIGHT and only shudders passively from impact. Only AFTER this visible hit, the TOP-LEFT SUB-ZERO health bar loses about one tenth of its current fill. The TOP-RIGHT SCORPION health bar remains unchanged. RIGHT retracts his arm; LEFT never retaliates. Both keep facing each other, and the reduced left-side health persists."
+      }
+    ],
+    "jumpPrompt": "The LEFT blue ice fighter makes one small vertical hop in place while his head, chest, hips, knees, and toes remain directed RIGHT toward his opponent, then lands on the same left-side flagstones. The RIGHT fighter stays motionless facing LEFT; both health bars retain their current levels.",
+    "crouchPrompt": "The LEFT blue ice fighter bends his knees into a crouching guard without turning his head, chest, hips, or feet away from the RIGHT fighter. The RIGHT fighter stays motionless facing LEFT on his original flagstones; the camera and both health fills remain unchanged.",
+    "standPrompt": "The LEFT blue ice fighter straightens into his original upright guard still facing directly RIGHT at the RIGHT fighter, who stays motionless facing directly LEFT. Neither changes position or orientation, and both health fills retain their current levels."
+  }
+}

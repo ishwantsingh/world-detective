@@ -1,0 +1,43 @@
+{
+  "id": "backrooms_ps5_anomaly",
+  "name": "Backrooms: PS5 Anomaly",
+  "description": "First-person Backrooms expedition — key 1 = console relocation, key 2 = controller trail, key 3 = power surge",
+  "image": {
+    "label": "Backrooms PS5 Anomaly",
+    "src": "/lingbot-cases/backrooms-ps5-anomaly.png"
+  },
+  "scene": {
+    "base": {
+      "default": "First-person exploration through the Backrooms: an endless maze of vacant yellow-beige office halls with unusually wide, long corridors and broad open doorways leading into more empty rooms. Stained patterned wallpaper, low ceiling tiles, dull brown carpet, square support columns, and flickering fluorescent ceiling panels repeat into the distance. Scattered through the impossible rooms are several pristine white PlayStation 5 consoles, each standing upright in a different unexpected place: tucked beside a column, abandoned at the end of a wide hall, half-hidden beyond a broad doorway, or sitting alone on the carpet. The explorer's body is never visible. No screens, no text, no logos, no other people. Oppressive liminal horror, sickly yellow-green fluorescent light, soft film grain, the constant electrical hum of the lights."
+    },
+    "camera": {
+      "default": {
+        "static": "Strict first-person eye-level view, standing still in an empty Backrooms hall. No character body, hands, reflection, or shadow is visible. Look-input alone pans naturally through the broad doorways and wide corridors, revealing silent distant white consoles.",
+        "dynamic": "Strict first-person eye-level view as the explorer walks deeper through wide, long Backrooms hallways. The camera moves smoothly forward at a cautious walking pace; look-input turns naturally through broad open doorways and branching corridors. No character body or hands are visible."
+      }
+    },
+    "movement": {
+      "default": {
+        "static": "The viewpoint stays tense and motionless on the worn carpet, listening as fluorescent tubes buzz overhead. A white console remains upright and motionless somewhere beyond a broad doorway, its smooth surfaces catching the jaundiced light.",
+        "dynamic": "The first-person viewpoint walks cautiously forward through endless wide carpeted halls, footsteps muffled by the damp floor. Columns and broad open doorways slide past while a different white console seems to wait at every turn, always isolated and slightly out of place."
+      }
+    },
+    "events": [
+      {
+        "name": "Console Relocation",
+        "detail": "The nearest white console blinks out for a split second with a faint electrical crackle. When the fluorescent lights settle, it is gone from its original spot and another pristine console is now standing in a completely different random-looking place farther down a wide side hallway, perfectly upright and untouched."
+      },
+      {
+        "name": "Controller Trail",
+        "detail": "A loose trail of white game controllers has appeared on the carpet, placed one at a time like breadcrumbs leading through a broad doorway into a darker Backrooms hall. At the far end of the trail, a single upright white console waits beneath a flickering ceiling panel."
+      },
+      {
+        "name": "Power Surge",
+        "detail": "The fluorescent lights stutter through a sudden power surge, throwing long shadows across the yellow walls. In each burst of light, more white consoles appear in new scattered positions — by a column, in a doorway, at the far end of a corridor — then remain silently standing after the lights stabilize."
+      }
+    ],
+    "jumpPrompt": "The first-person camera jolts upward in a startled jump as the overhead lights buzz sharply, then lands and steadies at eye level in the empty hallway.",
+    "crouchPrompt": "The first-person camera lowers into a cautious crouch near the damp carpet, sinking smoothly to a low, near-floor vantage beneath the yellow-lit sightlines.",
+    "standPrompt": "The first-person camera rises carefully back to normal eye level, scanning the wide maze and the scattered consoles again."
+  }
+}

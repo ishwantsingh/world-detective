@@ -1,0 +1,42 @@
+{
+  "id": "wizard_broomstick_flight",
+  "name": "Wizard: Broomstick Flight",
+  "description": "Third-person broom trial through a permanent course of golden rings — Gemini Autopilot can steer with live video; key 1 = speed boost, key 2 = storm front; Space = climb, C = descend",
+  "image": {
+    "label": "Wizard flying toward a castle with floating PS5 consoles",
+    "src": "/lingbot-cases/wizard-broomstick-flight.png"
+  },
+  "scene": {
+    "base": {
+      "default": "A young wizard with short brown hair, wearing a burgundy hooded cloak with ornate gold embroidery, dark trousers and leather boots, rides a weathered wooden broomstick high above a broad lake in a green mountain valley. A vast gothic stone castle with pointed towers, glowing windows, bridges and steep rocky foundations stands ahead across the water. Forested cliffs, waterfalls, a long stone viaduct on the left and a walled sporting field on the right surround the lake. A continuous broom trial course of large, clearly visible golden magical rings is suspended ahead, one reachable ring at a time, winding toward the castle between bridges and towers. Each ring has a bright gold rim, open centre and faint blue guiding glow; the next ring is always distinct from scenery and centred along a plausible flight route. Several white-and-black PlayStation 5 consoles float at the centres of some widely spaced rings, gently suspended with pale-blue magical trails. Realistic cinematic fantasy, soft afternoon sunlight breaking through billowing clouds, atmospheric mountain haze, detailed cloth and rippling water."
+    },
+    "camera": {
+      "default": {
+        "static": "Third-person view from close behind and slightly above the wizard, showing the burgundy cloak, boots and broomstick in the foreground and the castle ahead. The wizard hovers at a fixed position and stays centred at a constant size; look-input alone arcs the camera around the stationary rider. Never switch to first-person.",
+        "dynamic": "Strict third-person rear tracking view from close behind and slightly above the flying wizard, with the cloak and broomstick centred at a constant distance. The camera follows the rider through the valley; look-input steers the wizard's heading while the camera maintains its trailing position. The castle, cliffs and floating consoles shift naturally with flight, never switching to first-person."
+      }
+    },
+    "movement": {
+      "default": {
+        "static": "The wizard hovers steadily on the broomstick above the lake, hands gripping the wooden shaft, boots hanging below and cloak fluttering gently in the wind. The floating white consoles remain stationary in the surrounding air; the rider does not advance without movement input.",
+        "dynamic": "The wizard glides forward on the broomstick through the open valley, leaning into the flight as the embroidered cloak streams backward. Trees and lake reflections slide beneath the rider while castle towers grow nearer. The next golden ring grows larger as the rider approaches; the broom and wizard pass cleanly through its open centre, then the following ring becomes the clear next target. A floating PS5 at a ring centre dissolves into a small burst of blue sparks only when the rider physically passes through its position. Rings beside or beyond the flight path remain in place."
+      }
+    },
+    "events": [
+      {
+        "name": "Speed Boost",
+        "detail": {
+          "static": "Pale-blue magical energy gathers around the broom's bristles while the wizard stays hovering in place, the cloak rippling in the charged air.",
+          "dynamic": "Pale-blue magical energy streams from the broom's bristles as the wizard accelerates forward, cloak whipping behind, the lake and treetops sweeping past faster while the floating consoles remain fixed in the valley."
+        }
+      },
+      {
+        "name": "Storm Front",
+        "detail": "A dark storm front rolls across the mountain peaks, silver rain sweeping over the lake and distant lightning briefly illuminating the castle spires. The wind billows the wizard's burgundy cloak, while the suspended white consoles and their pale-blue trails remain clearly visible against the clouds."
+      }
+    ],
+    "jumpPrompt": "The wizard pulls the broomstick's nose upward and climbs smoothly into the air, rising above the lake and treetops while the third-person camera follows the rider's ascent.",
+    "crouchPrompt": "The wizard leans low over the broomstick and tips its nose gently downward, descending toward the lake while remaining airborne as the third-person camera follows the rider lower.",
+    "standPrompt": "The wizard straightens in the saddle and levels the broomstick out, smoothly returning to level flight above the lake as the camera settles behind the rider."
+  }
+}

@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+
 import {
   LingbotWorld2MainVideoView,
   LingbotWorld2Provider,
@@ -8,6 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { SnapClip } from "@/components/SnapClip";
+import { Ps5PickupCounter } from "@/components/Ps5PickupCounter";
+import { BroomTrialAutopilot } from "@/components/BroomTrialAutopilot";
 import { LingbotWorldController } from "@/components/lingbot-world-2/LingbotWorldController";
 
 // Reactor Platform the SDK connects to. Override with
@@ -149,6 +153,7 @@ function StatusBar() {
 
 function MainContent() {
   const { sidebar, controls } = LingbotWorldController({});
+  const videoContainer = useRef<HTMLDivElement>(null);
 
   return (
     <main className="relative z-10 flex-1 min-h-0 flex flex-col px-4 sm:px-6 pb-4 sm:pb-6 pt-3 max-lg:overflow-y-auto lg:overflow-hidden">
@@ -166,7 +171,7 @@ function MainContent() {
 
           {/* Video + controls — stacked in the right column */}
           <div className="order-1 flex min-w-0 flex-col gap-4 lg:order-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
-            <div className="relative bg-black rounded-xl overflow-hidden border border-white/[0.08] aspect-video">
+            <div ref={videoContainer} className="relative bg-black rounded-xl overflow-hidden border border-white/[0.08] aspect-video">
               <LingbotWorld2MainVideoView
                 videoObjectFit="contain"
                 style={{
@@ -176,11 +181,13 @@ function MainContent() {
                   height: "100%",
                 }}
               />
+              <Ps5PickupCounter videoContainer={videoContainer} />
             </div>
 
             <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 sm:p-4">
               {controls}
             </div>
+            <BroomTrialAutopilot videoContainer={videoContainer} />
           </div>
         </div>
       </div>

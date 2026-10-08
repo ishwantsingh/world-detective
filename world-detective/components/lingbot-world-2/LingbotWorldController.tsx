@@ -729,7 +729,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
       // Resolves with the correlated `prompt_accepted` reply (or
       // `undefined` when the send fails — the model's `command_error`
       // broadcast carries the reason to the toast).
-      void lw2.setPrompt({ prompt: next }).then((reply) => {
+      void lw2.setPrompt({ prompt: next }).then((reply: unknown) => {
         if (reply) setHasPrompt(true);
       });
     }
@@ -749,7 +749,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
   // they resolve the awaited command instead of arriving here. The
   // handlers below cover what the model still `self.send`s to every
   // connection: shared state, per-chunk progress, and error reports.
-  useLingbotWorld2Message((raw) => {
+  useLingbotWorld2Message((raw: unknown) => {
     // The published schema doesn't declare `workers_ready`, so widen the
     // union locally; every other branch narrows to its typed shape.
     const msg = raw as
@@ -1887,17 +1887,17 @@ export function LingbotWorldController({ className }: { className?: string }) {
         void lw2.start();
         break;
       case "pause":
-        void lw2.pause().then((reply) => {
+        void lw2.pause().then((reply: unknown) => {
           if (reply) setIsPaused(true);
         });
         break;
       case "resume":
-        void lw2.resume().then((reply) => {
+        void lw2.resume().then((reply: unknown) => {
           if (reply) setIsPaused(false);
         });
         break;
       case "reset":
-        void lw2.reset().then((reply) => {
+        void lw2.reset().then((reply: unknown) => {
           if (reply) handleGenerationReset();
         });
         break;

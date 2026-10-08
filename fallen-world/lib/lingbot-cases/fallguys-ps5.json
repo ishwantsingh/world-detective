@@ -1,51 +1,71 @@
 {
-  "id": "case_fallguys_ps5",
+  "id": "case_fallguys_ps5_walk_v2",
   "name": "Fall Guys PS5 Course",
-  "description": "Third-person platformer — key 1 = collect PS5, key 2 = belly dive, key 3 = celebratory wave, key 4 = stumble recovery, key 5 = speed dash",
+  "description": "Leisurely third-person course exploration — key 1 = collect PS5, key 2 = belly dive, key 3 = celebratory wave, key 4 = stumble recovery, key 5 = speed dash",
   "image": {
     "label": "Fall Guys PS5 Obstacle Course",
     "src": "/lingbot-cases/fallguys_ps5.jpg"
   },
   "scene": {
     "base": {
-      "default": "A colorful floating obstacle track suspended over a wide blue ocean on a sunny day. A reptilian dino bean stands on a blue checkered platform facing a yellow ramp, rotating orange bumper pillars, spinning propeller hazards, and a rainbow arch. Floating PS5 consoles hover along the path emitting sparkles. Top-left HUD shows a PS5 icon with a counter reading 'PS5: 0'; top-right shows a time trial timer."
+      "default": "A lone reptilian dino bean quietly explores a colorful floating obstacle course above a wide blue ocean in warm daylight. The character has a rounded orange-and-green dinosaur costume, small back spikes, short legs, and stubby arms, matching the reference image. A blue-and-white checkered starting deck leads onto broad yellow platforms and ramps. Orange rotating bumper pillars and red propeller obstacles occupy fixed places along the course, with a rainbow arch in the distance. Individual floating PS5 consoles sparkle above the path. The ocean, distant hills, and course layout remain consistent. A PS5 collection counter stays at the top left and the practice-mode timer at the top right. A calm, playful afternoon of exploring the course."
     },
     "camera": {
       "default": {
-        "static": "Third-person perspective directly behind the dino bean character, maintaining constant center framing overlooking the obstacle course without moving.",
-        "dynamic": "Strict third-person chase camera trailing closely behind and slightly above the character, following forward movement down the track while keeping heading locked."
+        "static": "Third-person view from directly behind and slightly above the dino bean, its back and full body centered at a constant size and distance. Its feet and the yellow platform immediately ahead remain visible. Neither the character nor the camera changes position while idle; look-input alone arcs the camera around the stationary character.",
+        "dynamic": "Strict third-person rear view from close behind and slightly above the dino bean, its back and body filling the center of the frame at a constant size. The camera holds a fixed position relative to the character and tracks its steps without orbiting, zooming, or cutting. Look-input changes the character's heading. The nearby floor and obstacles remain clearly visible."
       }
     },
     "movement": {
       "default": {
-        "static": "The character idles in place, gently swaying side to side with subtle bouncing steps on the checkered deck.",
-        "dynamic": "The character walks slowly down the yellow path with small, deliberate waddling steps. The chase camera advances gently at the same pace, and nearby obstacles pass slowly."
+        "static": "The dino bean stands still with both feet planted on the platform, weight settled, arms hanging loosely at its sides. Only its gentle breathing and a small shift of weight animate the idle pose.",
+        "dynamic": "The dino bean advances at a steady, leisurely walking pace, taking short, deliberate waddling steps in the selected direction. It transfers its weight from one planted foot to the other, with one foot supporting its body during each walking stride. Its torso stays upright, its stubby arms sway gently, and its back spikes rock subtly with each footfall. Each step covers only a small distance; the yellow floor and nearby obstacles slide gradually beneath and past the character."
+      },
+      "dive": {
+        "static": "The dino bean bends its knees, makes one short forward belly dive, and slides a small distance before pushing itself back onto its feet.",
+        "dynamic": "The dino bean interrupts its walking steps with one short forward belly dive, slides along the platform, then pushes itself upright and resumes its leisurely walk."
+      },
+      "wave": {
+        "static": "The dino bean stays planted on both feet, straightens its torso, and raises its stubby arms for a cheerful greeting.",
+        "dynamic": "The dino bean shortens its walking steps to a brief pause, settles on both feet, and raises its stubby arms for a cheerful greeting."
+      },
+      "recovery": {
+        "static": "The dino bean shifts off balance, takes one small stabilizing step, and settles upright with both feet planted.",
+        "dynamic": "The dino bean's leisurely walk is interrupted by a small wobble; it takes a short stabilizing step, regains its upright posture, and continues walking at the same easy pace."
+      },
+      "dash": {
+        "static": "The dino bean leans forward and performs a brief speed dash along the platform, using quick steps and energetic arm swings.",
+        "dynamic": "The dino bean switches from its leisurely walk to a brief speed dash in the selected direction, leaning forward, lengthening its stride, and pumping its stubby arms as the platform passes more quickly beneath it."
       }
     },
     "events": [
       {
         "name": "Collect PS5",
-        "detail": "The character runs directly into a floating PS5 console; the console vanishes in a burst of sparkling light, and the top-left HUD counter immediately updates from 'PS5: 0' to 'PS5: 1'."
+        "detail": "The nearest floating PS5 console within the dino bean's reach is collected on contact, disappearing in a small burst of sparkling light. The top-left PS5 counter increases by one, showing 'PS5: 1' on the first collection. The pickup leaves the character's leisurely walking pace and relaxed posture unchanged."
       },
       {
         "name": "Belly Dive",
-        "detail": "The character leaps forward, diving flat onto its belly and sliding across the yellow platform surface before popping back up."
+        "movementVersion": "dive",
+        "detail": "The dino bean stretches its stubby arms forward, lands flat on its belly, and slides across the yellow platform for a short distance. Its costume compresses softly against the floor before it pushes up and regains its upright stance. The rear camera keeps the entire action in view."
       },
       {
         "name": "Celebratory Wave",
-        "detail": "The character pauses, turns slightly toward the camera, and waves both stubby arms in celebration."
+        "movementVersion": "wave",
+        "detail": "The dino bean turns its upper body slightly toward the camera and waves both stubby arms in a cheerful celebration, keeping its feet planted and the surrounding course unchanged."
       },
       {
         "name": "Stumble Recovery",
-        "detail": "The character clips an orange rotating bumper, wobbles backward with flailing arms, and quickly regains balance."
+        "movementVersion": "recovery",
+        "detail": "An orange rotating bumper beside the dino bean clips its side. It wobbles backward, spreads its arms for balance, takes one small corrective step, and settles back into a relaxed upright stance."
       },
       {
         "name": "Speed Dash",
-        "detail": "The character surges forward in a sudden burst of speed, kicking up small cartoon dust puffs along the runway."
+        "movementVersion": "dash",
+        "detail": "A brief burst of speed sends the dino bean forward, with small cartoon dust puffs appearing at its quick footfalls. This faster gait lasts only while the speed-dash action is engaged; afterward the character settles back into its leisurely walking rhythm."
       }
     ],
-    "jumpPrompt": "The character springs into the air off both feet, leaping high over the ramp gap with arms raised before landing cleanly on the platform.",
-    "crouchPrompt": "The character flattens down into a low belly slide along the floor, lowering the camera angle closer to the track.",
-    "standPrompt": "The character pushes up from the slide and stands fully upright as the camera returns to standard third-person height."
+    "jumpPrompt": "The walking or idle gait briefly gives way to one deliberate jump: the dino bean bends its knees, springs upward off both feet with its arms raised, then lands softly on the platform and settles back into its previous relaxed stance or walking rhythm.",
+    "crouchPrompt": "The walking or idle posture gives way to a low belly slide: the dino bean lowers its rounded body close to the platform with its arms forward, while the camera dips gently toward the floor.",
+    "standPrompt": "The dino bean pushes itself upright out of the low slide and returns to its relaxed standing or leisurely walking posture as the camera rises smoothly to its normal rear-view height."
   }
 }

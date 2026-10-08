@@ -1,0 +1,51 @@
+{
+  "id": "case_fallguys_ps5",
+  "name": "Fall Guys PS5 Course",
+  "description": "Third-person platformer — key 1 = collect PS5, key 2 = belly dive, key 3 = celebratory wave, key 4 = stumble recovery, key 5 = speed dash",
+  "image": {
+    "label": "Fall Guys PS5 Obstacle Course",
+    "src": "/lingbot-cases/fallguys_ps5.jpg"
+  },
+  "scene": {
+    "base": {
+      "default": "A colorful floating obstacle track suspended over a wide blue ocean on a sunny day. A reptilian dino bean stands on a blue checkered platform facing a yellow ramp, rotating orange bumper pillars, spinning propeller hazards, and a rainbow arch. Floating PS5 consoles hover along the path emitting sparkles. Top-left HUD shows a PS5 icon with a counter reading 'PS5: 0'; top-right shows a time trial timer."
+    },
+    "camera": {
+      "default": {
+        "static": "Third-person perspective directly behind the dino bean character, maintaining constant center framing overlooking the obstacle course without moving.",
+        "dynamic": "Strict third-person chase camera trailing closely behind and slightly above the character, following forward movement down the track while keeping heading locked."
+      }
+    },
+    "movement": {
+      "default": {
+        "static": "The character idles in place, gently swaying side to side with subtle bouncing steps on the checkered deck.",
+        "dynamic": "The character waddles forward at full speed down the yellow path, arms flapping slightly as it maneuvers past obstacles and steps on platforms."
+      }
+    },
+    "events": [
+      {
+        "name": "Collect PS5",
+        "detail": "The character runs directly into a floating PS5 console; the console vanishes in a burst of sparkling light, and the top-left HUD counter immediately updates from 'PS5: 0' to 'PS5: 1'."
+      },
+      {
+        "name": "Belly Dive",
+        "detail": "The character leaps forward, diving flat onto its belly and sliding across the yellow platform surface before popping back up."
+      },
+      {
+        "name": "Celebratory Wave",
+        "detail": "The character pauses, turns slightly toward the camera, and waves both stubby arms in celebration."
+      },
+      {
+        "name": "Stumble Recovery",
+        "detail": "The character clips an orange rotating bumper, wobbles backward with flailing arms, and quickly regains balance."
+      },
+      {
+        "name": "Speed Dash",
+        "detail": "The character surges forward in a sudden burst of speed, kicking up small cartoon dust puffs along the runway."
+      }
+    ],
+    "jumpPrompt": "The character springs into the air off both feet, leaping high over the ramp gap with arms raised before landing cleanly on the platform.",
+    "crouchPrompt": "The character flattens down into a low belly slide along the floor, lowering the camera angle closer to the track.",
+    "standPrompt": "The character pushes up from the slide and stands fully upright as the camera returns to standard third-person height."
+  }
+}

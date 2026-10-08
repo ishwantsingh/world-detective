@@ -152,7 +152,7 @@ function StatusBar() {
 }
 
 function MainContent() {
-  const { sidebar, controls } = LingbotWorldController({});
+  const { sidebar, controls, activeExampleId, generationEpoch, isRunning, setBroomControl } = LingbotWorldController({});
   const videoContainer = useRef<HTMLDivElement>(null);
 
   return (
@@ -187,7 +187,13 @@ function MainContent() {
             <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 sm:p-4">
               {controls}
             </div>
-            <BroomTrialAutopilot videoContainer={videoContainer} />
+            <BroomTrialAutopilot
+              videoContainer={videoContainer}
+              activeExampleId={activeExampleId}
+              generationEpoch={generationEpoch}
+              running={isRunning}
+              onControl={setBroomControl}
+            />
           </div>
         </div>
       </div>

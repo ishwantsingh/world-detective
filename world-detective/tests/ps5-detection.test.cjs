@@ -165,7 +165,8 @@ test('broom autopilot gives Gemini ordered frames and ring-specific controls', a
     assert.equal(options.headers['x-goog-api-key'], 'private-key');
     assert.equal(url.includes('private-key'), false);
     const payload = JSON.parse(options.body);
-    assert.match(payload.systemInstruction.parts[0].text, /golden ring/);
+    assert.match(payload.systemInstruction.parts[0].text, /Wizard: Ring Flying Trial/);
+    assert.match(payload.systemInstruction.parts[0].text, /red cloth banners/);
     assert.match(payload.systemInstruction.parts[0].text, /ArrowLeft/);
     assert.equal(payload.contents[0].parts.length, 4);
     assert.deepEqual(payload.generationConfig.responseSchema.properties.keys.items.enum, ['w', 's', 'a', 'd', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);

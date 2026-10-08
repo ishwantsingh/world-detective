@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { broomMotion, type BroomKey } from "@/lib/broom-controls";
 import {
   EXAMPLES,
   STRUCTURED_EXAMPLES,
@@ -461,6 +462,11 @@ export function LingbotWorldController({ className }: { className?: string }) {
   const [lookH, setLookH] = useState<LookH>("idle");
   const [lookV, setLookV] = useState<LookV>("idle");
   const [cameraPoseActive, setCameraPoseActive] = useState(false);
+  const [generationEpoch, setGenerationEpoch] = useState(0);
+  // null = manual control; [] = autopilot owns the controls but is holding.
+  const broomKeysRef = useRef<BroomKey[] | null>(null);
+  const releaseBroomControlRef = useRef<() => void>(() => {});
+  const handleGenerationResetRef = useRef<() => void>(() => {});
 
   // --- Native camera-pose layer (mouse-look + jump) ---
   const [mouseLook, setMouseLook] = useState(false); // pointer-lock engaged
@@ -714,8 +720,10 @@ export function LingbotWorldController({ className }: { className?: string }) {
 
     // No active scene → nothing to compose (prompts only flow from scenes).
     if (!sceneRef.current) return;
-    const isMoving =
-      moveLStackRef.current.length > 0 || moveLatStackRef.current.length > 0;
+    const broom = broomKeysRef.current === null ? null : broomMotion(broomKeysRef.current);
+    const isMoving = broom
+      ? broom.longitudinal !== "idle" || broom.lateral !== "idle"
+      : moveLStackRef.current.length > 0 || moveLatStackRef.current.length > 0;
     const next = composePrompt(
       sceneRef.current,
       isMoving,
@@ -765,6 +773,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
         setHasImage(msg.has_image);
         break;
       case "state":
+        if (!msg.started || !msg.running || msg.paused) releaseBroomControlRef.current();
         setHasPrompt(msg.has_prompt);
         setHasImage(msg.has_image);
         setIsGenerating(msg.running && msg.started);
@@ -772,6 +781,8 @@ export function LingbotWorldController({ className }: { className?: string }) {
         setCameraPoseActive(msg.camera_pose_active);
         break;
       case "generation_started":
+        releaseBroomControlRef.current();
+        setGenerationEpoch((epoch) => epoch + 1);
         setIsGenerating(true);
         setIsPaused(false);
         setChunkNum(msg.chunk_num);
@@ -802,8 +813,20 @@ export function LingbotWorldController({ className }: { className?: string }) {
         sendCameraPoseChunkRef.current();
         break;
       case "generation_complete":
+        releaseBroomControlRef.current();
         setIsGenerating(false);
         setIsPaused(false);
+        break;
+      case "generation_paused":
+        releaseBroomControlRef.current();
+        setIsPaused(true);
+        break;
+      case "generation_resumed":
+        setIsGenerating(true);
+        setIsPaused(false);
+        break;
+      case "generation_reset":
+        if (!isApplyingExampleRef.current) handleGenerationResetRef.current();
         break;
       case "command_error":
         setErrorToast(
@@ -821,6 +844,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
 
   useEffect(() => {
     if (status === "disconnected") {
+      broomKeysRef.current = null;
       setHasPrompt(false);
       setHasImage(false);
       setIsGenerating(false);
@@ -909,6 +933,19 @@ export function LingbotWorldController({ className }: { className?: string }) {
   // rotation back to the arrow keys / translation back to WASD.
   const sendCameraPoseChunk = useCallback(() => {
     if (!isReadyRef.current) return;
+    // Autopilot shares this sole pose sender with manual input. It cannot
+    // overwrite a second component's pose or inherit a held jump/joystick.
+    if (broomKeysRef.current !== null) {
+      const { pitch, yaw } = broomMotion(broomKeysRef.current);
+      const active = pitch !== 0 || yaw !== 0;
+      if (active || poseSentActiveRef.current) {
+        void lw2.setCameraPose({ camera_pose: active
+          ? Array.from({ length: CHUNK_LATENTS }, () => [pitch, yaw, 0, 0, 0, 0]).flat()
+          : [] });
+      }
+      poseSentActiveRef.current = active;
+      return;
+    }
     const joyActive = joyRef.current.x !== 0 || joyRef.current.y !== 0;
     // Jump contributes translation in "hold" (up while held) and "charge"
     // (the per-latent up→down arc while it plays). "prompt" never touches pose.
@@ -1075,6 +1112,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
   // Crouch control (C): -1 = held, 0 = off. Jump is separate.
   const setVert = useCallback(
     (dir: number) => {
+      if (broomKeysRef.current !== null && dir !== 0) return;
       if (vertDirRef.current === dir) return;
       const wasIdle = vertDirRef.current === 0;
       vertDirRef.current = dir;
@@ -1101,6 +1139,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
   //   prompt — just append the scene's jumpPrompt (no camera_pose).
   //   charge — start the charge meter stepping through levels; no motion/prompt yet.
   const onJumpDown = useCallback(() => {
+    if (broomKeysRef.current !== null) return;
     // Block re-triggers: ignore key-repeat while held, AND ignore a fresh press
     // while a charge arc is still airborne — no re-jump until it lands (no
     // double-jump), mirroring how a real jump can't restart mid-flight.
@@ -1254,6 +1293,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
   // Roll (the 3rd rotation DOF the mouse can't reach): -1 = Q, +1 = E, 0 = off.
   const setRoll = useCallback(
     (dir: number) => {
+      if (broomKeysRef.current !== null && dir !== 0) return;
       if (rollDirRef.current === dir) return;
       rollDirRef.current = dir;
       setRollDir(dir);
@@ -1267,6 +1307,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
   // knob position is normalized to the unit disk; releasing snaps back to 0.
   const onJoyPointer = useCallback(
     (e: React.PointerEvent, kind: "down" | "move" | "up") => {
+      if (broomKeysRef.current !== null) return;
       if (kind === "up") {
         joyRef.current = { x: 0, y: 0 };
         setJoy({ x: 0, y: 0 });
@@ -1315,6 +1356,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
 
   const pushLookH = useCallback(
     (next: LookH) => {
+      if (broomKeysRef.current !== null && next !== "idle") return;
       setLookH(next);
       const dir = next === "right" ? 1 : next === "left" ? -1 : 0;
       if (lookHDirRef.current === dir) return;
@@ -1326,6 +1368,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
 
   const pushLookV = useCallback(
     (next: LookV) => {
+      if (broomKeysRef.current !== null && next !== "idle") return;
       setLookV(next);
       const dir = next === "up" ? 1 : next === "down" ? -1 : 0;
       if (lookVDirRef.current === dir) return;
@@ -1336,6 +1379,13 @@ export function LingbotWorldController({ className }: { className?: string }) {
   );
 
   const applyMovementStack = useCallback(() => {
+    if (broomKeysRef.current !== null) {
+      const motion = broomMotion(broomKeysRef.current);
+      pushMoveL(motion.longitudinal);
+      pushMoveLat(motion.lateral);
+      recomputePromptAndSend();
+      return;
+    }
     const topL = moveLStackRef.current.at(-1);
     const topLat = moveLatStackRef.current.at(-1);
     pushMoveL(topL ?? "idle");
@@ -1374,6 +1424,19 @@ export function LingbotWorldController({ className }: { className?: string }) {
     pushLookV("idle");
   }, [applyMovementStack, pushLookH, pushLookV, setVert, setRoll]);
 
+  const setBroomControl = useCallback((keys: BroomKey[] | null) => {
+    if (keys === null && broomKeysRef.current === null) return;
+    const takingOver = keys !== null && broomKeysRef.current === null;
+    broomKeysRef.current = keys === null ? null : [...keys];
+    if (takingOver || keys === null) {
+      if (typeof document !== "undefined" && document.pointerLockElement) document.exitPointerLock();
+      clearMovementInputs();
+    }
+    applyMovementStack();
+    sendCameraPoseChunk(); // apply/release a heading immediately, then per chunk
+  }, [clearMovementInputs, applyMovementStack, sendCameraPoseChunk]);
+  releaseBroomControlRef.current = () => setBroomControl(null);
+
   // Full local cleanup after a user-initiated Reset. On runtime 3.2+ the
   // model's `generation_reset` is the correlated reply to `lw2.reset()`
   // (not a broadcast), so `sendLifecycle` awaits the call and invokes
@@ -1381,6 +1444,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
   // matching what the old broadcast handler skipped while
   // `isApplyingExampleRef` was set.
   const handleGenerationReset = useCallback(() => {
+    releaseBroomControlRef.current();
     setIsGenerating(false);
     setIsPaused(false);
     clearMovementInputs(); // never leave a held control stuck after a reset
@@ -1405,6 +1469,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
       return null;
     });
   }, [clearMovementInputs]);
+  handleGenerationResetRef.current = handleGenerationReset;
 
   // ---- Prompt handlers ----
 
@@ -1470,6 +1535,12 @@ export function LingbotWorldController({ className }: { className?: string }) {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
       if (isTypingTarget(e.target)) return;
+      if (broomKeysRef.current !== null &&
+          (KEY_TO_MOVE_L[e.key] || KEY_TO_MOVE_LAT[e.key] || KEY_TO_LOOK_H[e.key] ||
+           KEY_TO_LOOK_V[e.key] || e.code === "Space" || /^[qecjo]$/i.test(e.key))) {
+        e.preventDefault();
+        return;
+      }
 
       const mvL = KEY_TO_MOVE_L[e.key];
       if (mvL) {
@@ -1634,6 +1705,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
   ]);
 
   const onMoveLPress = (mv: Exclude<MoveL, "idle">) => {
+    if (broomKeysRef.current !== null) return;
     const stack = moveLStackRef.current;
     if (!stack.includes(mv)) stack.push(mv);
     applyMovementStack();
@@ -1643,6 +1715,7 @@ export function LingbotWorldController({ className }: { className?: string }) {
     applyMovementStack();
   };
   const onMoveLatPress = (mv: Exclude<MoveLat, "idle">) => {
+    if (broomKeysRef.current !== null) return;
     const stack = moveLatStackRef.current;
     if (!stack.includes(mv)) stack.push(mv);
     applyMovementStack();
@@ -1726,6 +1799,8 @@ export function LingbotWorldController({ className }: { className?: string }) {
       }
 
       isApplyingExampleRef.current = true;
+      releaseBroomControlRef.current();
+      setGenerationEpoch((epoch) => epoch + 1); // invalidate in-flight visual decisions immediately
       try {
         // Clear any held control state so stale refs don't linger across the switch
         moveLStackRef.current = [];
@@ -3387,5 +3462,9 @@ export function LingbotWorldController({ className }: { className?: string }) {
     </div>
   );
 
-  return { sidebar, controls };
+  return {
+    sidebar, controls, activeExampleId, generationEpoch,
+    isRunning: isReady && isGenerating && !isPaused && !loadingExampleId,
+    setBroomControl,
+  };
 }

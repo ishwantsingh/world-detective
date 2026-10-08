@@ -3,9 +3,9 @@
 // via set_prompt. Edits made through the in-page editor are persisted to
 // localStorage and survive reloads; ↺ on a card wipes its override.
 //
-// The default examples (see lingbot-cases-examples.ts) are converted from
-// the "lingbot-cases" corpus, one StructuredExample per case, each with
-// hold-key events (keys 1..9) plus optional jump/crouch/stand prompts.
+// The built-in ring trial (see lingbot-cases-examples.ts) is authored as
+// a StructuredExample. Custom scenes can also use hold-key events (keys
+// 1..9) and jump/crouch/stand prompts.
 
 import { LINGBOT_CASES_EXAMPLE_LIST } from "@/lib/lingbot-cases-examples";
 
@@ -239,10 +239,7 @@ export function emptyScene(): StructuredScene {
   };
 }
 
-// The example scenarios are sourced from the "lingbot-cases" corpus rather
-// than hand-authored here; see lingbot-cases-examples.ts for the conversion
-// (base_prompt -> base.default, per-slot actions -> events, "space" slot ->
-// jumpPrompt) and provenance notes.
+// Built-in case data is loaded by lingbot-cases-examples.ts.
 export const EXAMPLES: StructuredExample[] = LINGBOT_CASES_EXAMPLE_LIST;
 
 // The same examples keyed by id. The controller looks up scenes by example

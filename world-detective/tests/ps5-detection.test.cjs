@@ -169,7 +169,7 @@ test('broom autopilot gives Gemini ordered frames and ring-specific controls', a
     assert.match(payload.systemInstruction.parts[0].text, /red cloth banners/);
     assert.match(payload.systemInstruction.parts[0].text, /ArrowLeft/);
     assert.equal(payload.contents[0].parts.length, 4);
-    assert.deepEqual(payload.generationConfig.responseSchema.properties.keys.items.enum, ['w', 's', 'a', 'd', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
+    assert.deepEqual(payload.generationConfig.responseSchema.properties.keys.items.enum, ['w', 's', 'a', 'd', 'Space', 'c', 'ArrowLeft', 'ArrowRight']);
     return mockGemini({ keys: ['w'], confidence: 0.9, target: 'ring' })();
   });
 });

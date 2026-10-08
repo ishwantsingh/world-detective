@@ -8,7 +8,7 @@ const { createRequire } = require('node:module');
 
 // Execute the actual hooks/components with a deterministic clock and SDK.
 // No GPU session, React test dependency, or Google request is needed.
-function harness(componentPath, props, fetcher) {
+function harness(componentPath, props, fetcher, savedScene) {
   const root = path.resolve(__dirname, '..');
   let index = 0, dirty = true, tree, listener, now = 0;
   const slots = [], effects = [], timers = new Map(), events = new Map(), calls = [];
@@ -58,12 +58,13 @@ function harness(componentPath, props, fetcher) {
     addEventListener, removeEventListener, exitPointerLock() {},
     createElement: () => ({ getContext: () => ({ drawImage() {} }), toDataURL: () => 'data:image/jpeg;base64,/9j/AAAA' }),
   };
-  const context = { console, AbortSignal, AbortController, Response, Request, Buffer,
+  const context = { console, AbortSignal, AbortController, Response, Request, Buffer, process: { env: {} },
     HTMLElement: class HTMLElement {}, document,
     performance: { now: () => now }, Date: class extends Date { static now() { return now; } },
     fetch: fetcher ?? (async () => ({ ok: true, blob: async () => ({ type: 'image/png' }) })),
     File: class File {}, URL,
-    localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
+    localStorage: { getItem: key => key === 'lingbot-world-2:overrides:v1' && savedScene
+      ? JSON.stringify({ wizard_ring_flying_trial: savedScene }) : null, setItem() {}, removeItem() {} },
     requestAnimationFrame: () => 1, cancelAnimationFrame() {},
     setTimeout: () => 1, clearTimeout() {},
     window: { addEventListener, removeEventListener,
@@ -81,8 +82,13 @@ function harness(componentPath, props, fetcher) {
       if (name === 'react') return hooks;
       if (name === '@reactor-models/lingbot-world-2') return {
         useLingbotWorld2: () => sdk, useLingbotWorld2Message: callback => { listener = callback; },
+        LingbotWorld2MainVideoView: function Video() {},
       };
       if (name === '@/lib/utils') return { cn: (...values) => values.filter(Boolean).join(' ') };
+      if (name === '@/components/lingbot-world-2/LingbotWorldController') return {
+        LingbotWorldController: () => ({ sidebar: 'setup', controls: 'movement', activeExampleId: 'wizard_ring_flying_trial',
+          generationEpoch: 1, isRunning: true, setBroomControl() {} }),
+      };
       if (name.startsWith('@/components/')) return new Proxy({}, { get: () => function Component() {} });
       if (name.startsWith('@/') || name.startsWith('.')) {
         const target = name.startsWith('@/') ? path.join(root, name.slice(2)) : path.resolve(path.dirname(filename), name);
@@ -127,7 +133,7 @@ test('autopilot only enables for Ring Flying Trial, samples during inference, an
   const controls = [], requests = [];
   let resolve;
   const h = harness('components/BroomTrialAutopilot.tsx', {
-    videoContainer: { current: null }, activeExampleId: 'wizard_broomstick_flight',
+    videoContainer: { current: null }, activeExampleId: '__custom__',
     running: true, generationEpoch: 1, onControl: keys => controls.push(keys && [...keys]),
   }, async (_url, options) => {
     requests.push(JSON.parse(options.body));
@@ -142,7 +148,7 @@ test('autopilot only enables for Ring Flying Trial, samples during inference, an
   assert.deepEqual(controls.at(-1), []);
   await h.tick(); await h.tick(); await h.tick();
   assert.equal(requests.length, 1); // no concurrent inference
-  h.update({ activeExampleId: 'noir_alley_patrol' });
+  h.update({ activeExampleId: '__custom__' });
   assert.equal(controls.at(-1), null);
   resolve(Response.json({ keys: ['w'], confidence: 0.9, target: 'ring' }));
   await new Promise(done => setImmediate(done)); h.render();
@@ -212,7 +218,7 @@ test('main controller keeps prompt, WASD and one camera-pose sender coherent', a
   h.message({ type: 'chunk_complete', chunk_index: 1 });
   const poses = h.calls.filter(call => call.name === 'setCameraPose');
   assert.equal(poses.length, 1);
-  assert.deepEqual(poses[0].payload.camera_pose, [0, -0.055, 0, 0, 0, 0, 0, -0.055, 0, 0, 0, 0, 0, -0.055, 0, 0, 0, 0]);
+  assert.deepEqual(poses[0].payload.camera_pose, [0, -0.015, 0, 0, 0, 0, 0, -0.015, 0, 0, 0, 0, 0, -0.015, 0, 0, 0, 0]);
   const manualStrafe = h.find(element => element.props?.label === 'A', h.render().controls);
   h.calls.length = 0;
   manualStrafe.props.onPress(); h.render();
@@ -229,5 +235,92 @@ test('main controller keeps prompt, WASD and one camera-pose sender coherent', a
   assert.equal(h.calls.find(call => call.name === 'setMoveLongitudinal').payload.move_longitudinal, 'idle');
   h.message({ type: 'generation_reset' });
   assert.equal(h.render().activeExampleId, null);
+  h.unmount();
+});
+
+test('autopilot altitude is sustained translation with fixed pitch; manual jump stays disabled', async () => {
+  const h = harness('components/lingbot-world-2/LingbotWorldController.tsx', {});
+  const example = h.find(element => element.type === 'button' &&
+    element.props.title === 'Apply this example (loads image and starts generation)', h.render().sidebar);
+  await example.props.onClick(); h.render();
+  h.message({ type: 'generation_started', chunk_num: 100 });
+  for (const label of ['⤒ Space', '⤓ C']) {
+    const button = h.find(element => element.props?.label === label, h.render().controls);
+    assert.equal(button.props.disabled, true);
+    h.calls.length = 0;
+    button.props.onDown(); h.render();
+    assert.equal(h.calls.length, 0, 'altitude handler ignores input even if called directly');
+  }
+  const { scene } = require('../lib/lingbot-cases/wizard-ring-flying-trial.json');
+  for (const [keys, ty, yaw, prompt, label] of [
+    [['Space'], -1, 0, scene.jumpPrompt, '⤒ Space'],
+    [['c'], 1, 0, scene.crouchPrompt, '⤓ C'],
+    [['w', 'a', 'Space', 'ArrowLeft'], -1, -0.015, scene.jumpPrompt, '⤒ Space'],
+    [['w', 'd', 'c', 'ArrowRight'], 1, 0.015, scene.crouchPrompt, '⤓ C'],
+  ]) {
+    h.render().setBroomControl(null); h.render();
+    h.calls.length = 0;
+    h.render().setBroomControl(keys); h.render();
+    const composed = h.calls.find(call => call.name === 'setPrompt').payload.prompt;
+    assert.ok(composed.includes(scene.camera.default.dynamic), 'altitude-only flight uses the moving camera prompt');
+    assert.ok(composed.includes(prompt), 'scene altitude prompt matches the command');
+    assert.equal(h.find(element => element.props?.label === label, h.render().controls).props.lit, true);
+    const expected = Array.from({ length: 3 }, () => [0, yaw, 0, 0, ty, 0]).flat();
+    assert.deepEqual(h.calls.filter(call => call.name === 'setCameraPose').at(-1).payload.camera_pose, expected);
+    h.calls.length = 0;
+    h.message({ type: 'chunk_complete', chunk_index: 1 });
+    assert.equal(h.calls.filter(call => call.name === 'setCameraPose').length, 1);
+    assert.deepEqual(h.calls.find(call => call.name === 'setCameraPose').payload.camera_pose, expected);
+  }
+  h.calls.length = 0;
+  h.render().setBroomControl([]); h.render();
+  assert.deepEqual(h.calls.filter(call => call.name === 'setCameraPose').at(-1).payload.camera_pose, []);
+  assert.match(h.calls.find(call => call.name === 'setPrompt').payload.prompt, /holds position without movement input/);
+  h.render().setBroomControl(['Space']); h.render();
+  h.calls.length = 0;
+  h.message({ type: 'generation_paused' });
+  assert.equal(h.render().isRunning, false);
+  assert.deepEqual(h.calls.filter(call => call.name === 'setCameraPose').at(-1).payload.camera_pose, []);
+  h.unmount();
+});
+
+test('autopilot altitude has fallback prompts for saved scenes without vertical text', async () => {
+  const scene = structuredClone(require('../lib/lingbot-cases/wizard-ring-flying-trial.json').scene);
+  delete scene.jumpPrompt;
+  scene.crouchPrompt = '   ';
+  const h = harness('components/lingbot-world-2/LingbotWorldController.tsx', {}, undefined, scene);
+  const example = h.find(element => element.type === 'button' &&
+    element.props.title === 'Apply this example (loads image and starts generation)', h.render().sidebar);
+  await example.props.onClick(); h.render();
+  h.message({ type: 'generation_started', chunk_num: 100 });
+  for (const [key, text] of [['Space', 'climbs smoothly'], ['c', 'descends smoothly']]) {
+    h.calls.length = 0;
+    h.render().setBroomControl([key]); h.render();
+    const prompt = h.calls.find(call => call.name === 'setPrompt').payload.prompt;
+    assert.ok(prompt.includes(text));
+    assert.ok(prompt.includes('fixed pitch'));
+  }
+  h.unmount();
+});
+
+test('game viewport expands without unmounting controls or interrupting autopilot', () => {
+  const h = harness('app/LingbotWorld2App.tsx', {});
+  const rail = () => h.find(element => element.type === 'aside');
+  const toggle = () => h.find(element => element.props?.['aria-controls'] === 'game-controls');
+  const autopilot = () => h.find(element => element.props?.onControl && element.props?.videoContainer);
+  const video = () => h.find(element => element.props?.videoObjectFit === 'contain');
+  const videoRef = autopilot().props.videoContainer;
+  assert.equal(toggle().props['aria-expanded'], true);
+  assert.match(rail().props.className, /lg:overflow-y-auto/);
+  assert.match(h.find(element => element.props?.ref === videoRef).props.className, /lg:flex-1/);
+  assert.doesNotMatch(h.render().props.className, /max-w-/);
+  for (const expanded of [false, true]) {
+    toggle().props.onClick(); h.render();
+    assert.equal(toggle().props['aria-expanded'], expanded);
+    assert.equal(rail().props.className.startsWith('hidden'), !expanded);
+    assert.equal(autopilot().props.videoContainer, videoRef);
+    assert.equal(autopilot().props.running, true);
+    assert.ok(video(), 'video remains mounted');
+  }
   h.unmount();
 });

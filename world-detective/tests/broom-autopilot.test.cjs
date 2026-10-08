@@ -13,7 +13,7 @@ const { analyzeBroomFrames, readBroomSteeringRequest } = require('../lib/broom-a
 const { broomMotion, safeBroomKeys } = require('../lib/broom-controls.ts');
 const { POST } = require('../app/api/broom/steer/route.ts');
 const frames = [{ timestamp: 1000, image: '/9j/AAAA' }, { timestamp: 1850, image: '/9j/AAAA' }];
-const decision = { keys: ['w', 'ArrowLeft', 'ArrowUp'], confidence: 0.9, target: 'ring' };
+const decision = { keys: ['w', 'ArrowLeft'], confidence: 0.9, target: 'ring' };
 const reply = (text, finishReason = 'STOP', extraParts = []) => Response.json({ candidates: [{
   finishReason, content: { parts: [...extraParts, { text }] },
 }] });
@@ -24,6 +24,9 @@ test('Gemini 3 receives a separate low thinking setting and sufficient answer bu
     const config = JSON.parse(options.body).generationConfig;
     assert.deepEqual(config.thinkingConfig, { thinkingLevel: 'low' });
     assert.equal(config.maxOutputTokens, 2048);
+    assert.deepEqual(config.responseSchema.properties.keys.items.enum, ['w', 's', 'a', 'd', 'Space', 'c', 'ArrowLeft', 'ArrowRight']);
+    assert.equal(config.responseSchema.properties.keys.maxItems, 4);
+    assert.match(JSON.parse(options.body).systemInstruction.parts[0].text, /Keep camera pitch fixed/);
     return reply(JSON.stringify(decision));
   });
   assert.deepEqual(result, decision);
@@ -65,6 +68,9 @@ test('empty, blocked, malformed and contradictory replies fail without controls'
   for (const text of ['{"keys":["w"', 'null', '[]', 'please fly ' + JSON.stringify(decision),
     JSON.stringify({ ...decision, keys: ['ArrowLeft', 'ArrowRight'] }),
     JSON.stringify({ ...decision, keys: ['w', 'w'] }),
+    JSON.stringify({ ...decision, keys: ['w', 'ArrowUp'] }),
+    JSON.stringify({ ...decision, keys: ['ArrowDown'] }),
+    JSON.stringify({ ...decision, keys: ['Space', 'c'] }),
     JSON.stringify({ ...decision, confidence: '0.9' })]) {
     await assert.rejects(analyze(async () => reply(text)), error => error.status === 502);
   }
@@ -76,9 +82,31 @@ test('only confident visible targets can hold motion; arrow signs match the main
   assert.deepEqual(safeBroomKeys({ ...decision, target: 'none' }), []);
   assert.deepEqual(safeBroomKeys({ ...decision, keys: ['w', 's'] }), []);
   assert.deepEqual(broomMotion(safeBroomKeys(decision)), {
-    longitudinal: 'forward', lateral: 'idle', pitch: 0.055, yaw: -0.055,
+    longitudinal: 'forward', lateral: 'idle', pitch: 0, yaw: -0.015, vertical: 0,
   });
-  assert.deepEqual(broomMotion([]), { longitudinal: 'idle', lateral: 'idle', pitch: 0, yaw: 0 });
+  assert.deepEqual(broomMotion([]), { longitudinal: 'idle', lateral: 'idle', pitch: 0, yaw: 0, vertical: 0 });
+  assert.equal(broomMotion(['ArrowUp']).pitch, 0);
+  assert.equal(broomMotion(['ArrowDown']).pitch, 0);
+});
+
+test('vertical camera keys are still rejected independently', async () => {
+  for (const key of ['ArrowUp', 'ArrowDown']) {
+    const result = { ...decision, keys: ['w', key, 'ArrowRight'] };
+    await assert.rejects(analyze(async () => reply(JSON.stringify(result))), /invalid steering decision/);
+    assert.deepEqual(safeBroomKeys(result), []);
+  }
+});
+
+test('altitude keys translate up/down with fixed pitch and support combined steering', async () => {
+  for (const [key, vertical] of [['Space', -1], ['c', 1]]) {
+    const result = { ...decision, keys: ['w', 'a', key, 'ArrowRight'] };
+    assert.deepEqual(await analyze(async () => reply(JSON.stringify(result))), result);
+    assert.deepEqual(broomMotion(safeBroomKeys(result)), {
+      longitudinal: 'forward', lateral: 'strafe_left', pitch: 0, yaw: 0.015, vertical,
+    });
+    assert.equal(broomMotion([key]).vertical, vertical);
+  }
+  assert.deepEqual(safeBroomKeys({ ...decision, keys: ['Space', 'c'] }), []);
 });
 
 test('steering route validates requests and keeps provider failures and keys private', async () => {
